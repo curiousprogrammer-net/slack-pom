@@ -1,8 +1,10 @@
 (ns slack-pom.core
   (:gen-class)
-  (:require [slack-pom.pomodoro :as pom]
+  (:require [slack-pom.keyboard :as keyboard]
+            [slack-pom.pomodoro :as pom]
             [slack-pom.slack :as slack]
-            [slack-pom.tray :as tray]))
+            [slack-pom.tray :as tray])
+  (:import org.jnativehook.keyboard.NativeKeyEvent))
 
 (defn update-slack-status-fn [slack-connection]
   (fn [remaining-seconds]
@@ -39,12 +41,38 @@
      h:  help
      q:  quit"))
 
+(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_A})
+(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_D})
+
+(def global-listeners (atom []))
+
+(defn register-keyboard-shortcuts! []
+  (swap! global-listeners
+         conj
+         (keyboard/register-global-key-listener! start-pom-shortcut start-pom))
+  (swap! global-listeners
+         conj
+         (keyboard/register-global-key-listener! stop-pom-shortcut stop-pom))
+  (keyboard/register-native-hook!))
+
+(defn unregister-keyboard-shortcuts! []
+  (doseq [listener @global-listeners]
+    (keyboard/unregister-global-key-listener! listener))
+  (reset! global-listeners [])
+  (keyboard/unregister-native-hook!))
+
+#_(register-keyboard-shortcuts!)
+#_(unregister-keyboard-shortcuts!)
+
 (defn -main
   "Main app entry point"
   [& args]
+  (register-keyboard-shortcuts!)
   (loop [command "h"]
     (if (= command "q")
-      (println "Quit!")
+      (do 
+        (println "Quit!")
+        (unregister-keyboard-shortcuts!))
       (do 
         (case command
           "sp" (start-pom)

@@ -19,7 +19,7 @@
    (let [image (BufferedImage. width height BufferedImage/TYPE_INT_ARGB)
          graphics (.createGraphics image)
          font (Font. "TimesRoman" Font/BOLD font-size)]
-     (.setColor graphics Color/BLACK)
+     (.setColor graphics Color/WHITE)
      (.setFont graphics font)
      (.drawString graphics string 10 (+ font-size 10))
      image)))
@@ -34,7 +34,7 @@
 ;;;
 
 (defn create-tray-icon [image]
-  (if (SystemTray/isSupported)
+  (when (SystemTray/isSupported)
     (let [tray (SystemTray/getSystemTray)
           tray-icon (TrayIcon. image)]
       (.add tray tray-icon)
