@@ -21,10 +21,12 @@
                                     status-text
                                     status-emoji))))))
 
-(defn update-clock-fn []
-  (fn [remaining-seconds]
-    ;; TODO update tray icon
-))
+(defn update-clock-fn [duration-seconds]
+  (tray/remove-all-tray-icons)
+  (let [clock-tray-icon (atom (-> duration-seconds tray/create-clock-image tray/create-tray-icon))]
+    (fn [remaining-seconds]
+      (tray/update-tray-icon @clock-tray-icon
+                             (tray/create-clock-image remaining-seconds)))))
 
 (def default-pomodoro-duration-seconds 1500)
 
@@ -33,7 +35,7 @@
   ([duration-seconds]
    (let [slack-connection (slack/make-connection slack-token)
          listeners [(update-slack-status-fn slack-connection)
-                    (update-clock-fn)]]
+                    (update-clock-fn duration-seconds)]]
      (pom/start-pomodoro listeners duration-seconds))))
 
 (def stop-pom (pom/stop-pomodoro))
