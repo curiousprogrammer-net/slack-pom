@@ -18,24 +18,24 @@
 
 (defn- build-status [remaining-seconds]
   (let [remaining-minutes (quot remaining-seconds 60)]
-    (when (zero? (mod remaining-seconds 60))
-      ;; update in 1-minute intervals
-      (let [pomodoro-done? (zero? remaining-seconds)
-            status-text (if pomodoro-done?
-                          ""
-                          (format "Pomodoro - %s min left" remaining-minutes))
-            status-emoji (if pomodoro-done?
-                           ""
-                           ":tomato:")]
-        (println "Update slack status: " status-text)
-        {:text status-text
-         :emoji status-emoji}))))
+    (let [pomodoro-done? (zero? remaining-seconds)
+          status-text (if pomodoro-done?
+                        ""
+                        (format "Pomodoro - %s min left" remaining-minutes))
+          status-emoji (if pomodoro-done?
+                         ""
+                         ":tomato:")]
+      {:text status-text
+       :emoji status-emoji})))
 
 (defn update-user-status [slack-connection remaining-seconds]
-  (let [{:keys [text emoji]} (build-status remaining-seconds)]
-    (update-status slack-connection
-                   text
-                   emoji)))
+  (when (zero? (mod remaining-seconds 60))
+    ;; update in 1-minute intervals
+    (let [{:keys [text emoji]} (build-status remaining-seconds)]
+      (println "Update slack status: " text)
+      (update-status slack-connection
+                     text
+                     emoji))))
 
 (defn clear-user-status [slack-connection]
   (update-user-status slack-connection 0))
