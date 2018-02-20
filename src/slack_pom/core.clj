@@ -28,8 +28,8 @@
 (defn stop-pom []
   (pom/stop-pomodoro)
   (tray/remove-all-tray-icons)
-  (slack/update-user-status )
-  )
+  (slack/clear-user-status (slack/make-connection slack-token))
+  nil)
 
 (defn print-help []
   (println "Hello!

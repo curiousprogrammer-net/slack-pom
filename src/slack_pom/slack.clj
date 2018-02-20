@@ -10,14 +10,13 @@
 (def slack-api-url "https://slack.com/api")
 (def set-profile-endpoint "users.profile.set")
 
-
-(defn update-status [slack-connection status-text status-emoji]
+(defn- update-status [slack-connection status-text status-emoji]
   (slack/slack-request slack-connection
                        set-profile-endpoint
                        {"profile" (json/write-str {"status_text" status-text
                                                    "status_emoji" status-emoji})}))
 
-(defn build-status [remaining-seconds]
+(defn- build-status [remaining-seconds]
   (let [remaining-minutes (quot remaining-seconds 60)]
     (when (zero? (mod remaining-seconds 60))
       ;; update in 1-minute intervals
@@ -28,15 +27,18 @@
             status-emoji (if pomodoro-done?
                            ""
                            ":tomato:")]
+        (println "Update slack status: " status-text)
         {:text status-text
          :emoji status-emoji}))))
 
 (defn update-user-status [slack-connection remaining-seconds]
   (let [{:keys [text emoji]} (build-status remaining-seconds)]
-    (println "Update slack status: " text)
-    (update-user-status slack-connection
-                        text
-                        emoji)))
+    (update-status slack-connection
+                   text
+                   emoji)))
+
+(defn clear-user-status [slack-connection]
+  (update-user-status slack-connection 0))
 
 (defn make-connection
   ([api-token]
@@ -44,9 +46,8 @@
   ([api-token api-url]
    {:api-url api-url :token api-token}))
 
-
 (comment
-  
+
   (def my-connection (make-connection "xxx"))
 
   ;; set status manually - using query params is strange but that's how slack api works
