@@ -6,20 +6,7 @@
 
 (defn update-slack-status-fn [slack-connection]
   (fn [remaining-seconds]
-    (let [remaining-minutes (quot remaining-seconds 60)]
-      (when (zero? (mod remaining-seconds 60))
-        ;; update in 1-minute intervals
-        (let [pomodoro-done? (zero? remaining-seconds)
-              status-text (if pomodoro-done?
-                             ""
-                             (format "Pomodoro - %s min left" remaining-minutes))
-              status-emoji (if pomodoro-done?
-                             ""
-                             ":tomato:")]
-          (println "Update slack status: " status-text)
-          (slack/update-user-status slack-connection
-                                    status-text
-                                    status-emoji))))))
+    (slack/update-user-status slack-connection remaining-seconds)))
 
 (defn update-clock-fn [duration-seconds]
   (tray/remove-all-tray-icons)
@@ -38,7 +25,11 @@
                     (update-clock-fn duration-seconds)]]
      (pom/start-pomodoro listeners duration-seconds))))
 
-(def stop-pom (pom/stop-pomodoro))
+(defn stop-pom []
+  (pom/stop-pomodoro)
+  (tray/remove-all-tray-icons)
+  (slack/update-user-status )
+  )
 
 (defn print-help []
   (println "Hello!
@@ -59,6 +50,6 @@
           "sp" (start-pom)
           "tp" (stop-pom)
           "h"  (print-help)
-          :else (println "Unknown command"))
+          (println "Unknown command"))
         (recur (read-line)))))
   )
