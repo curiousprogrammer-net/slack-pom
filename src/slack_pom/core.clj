@@ -49,12 +49,14 @@
   nil)
 
 (defn print-help []
-  (println "Hello!
+  (println "
+Hello!
    Commands
-     sp: start pomodoro [duration-in-minutes] - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
-     tp: stop pomodoro  - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
-     h:  help
-     q:  quit"))
+     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
+     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
+     h:                           help
+     q:                           quit
+"))
 
 (def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_COMMA})
 (def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_PERIOD})
