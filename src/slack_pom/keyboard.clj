@@ -16,7 +16,12 @@
 
 (defn register-native-hook! []
   (disable-logging!)
-  (GlobalScreen/registerNativeHook))
+  (try
+    (GlobalScreen/registerNativeHook)
+    true
+    (catch Exception e
+      (println "ERROR: cannot register native keyboard hook:" (.getMessage e))
+      false)))
 
 (defn unregister-native-hook! []
   (GlobalScreen/unregisterNativeHook))

@@ -48,24 +48,25 @@
 (defn print-help []
   (println "Hello!
    Commands
-     sp: start pomodoro [duration-in-minutes]
-     tp: stop pomodoro
+     sp: start pomodoro [duration-in-minutes] - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
+     tp: stop pomodoro  - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
      h:  help
      q:  quit"))
 
-(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_A})
-(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_D})
+(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_COMMA})
+(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_PERIOD})
 
 (def global-listeners (atom []))
 
 (defn register-keyboard-shortcuts! []
-  (keyboard/register-native-hook!)
-  (swap! global-listeners
-         conj
-         (keyboard/register-global-key-listener! start-pom-shortcut start-pom))
-  (swap! global-listeners
-         conj
-         (keyboard/register-global-key-listener! stop-pom-shortcut stop-pom)))
+  (when
+   (keyboard/register-native-hook!)
+    (swap! global-listeners
+           conj
+           (keyboard/register-global-key-listener! start-pom-shortcut start-pom))
+    (swap! global-listeners
+           conj
+           (keyboard/register-global-key-listener! stop-pom-shortcut stop-pom))))
 
 (defn unregister-keyboard-shortcuts! []
   (doseq [listener @global-listeners]
