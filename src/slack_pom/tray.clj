@@ -19,7 +19,7 @@
    (let [image (BufferedImage. width height BufferedImage/TYPE_INT_ARGB)
          graphics (.createGraphics image)
          font (Font. "TimesRoman" Font/BOLD font-size)]
-     (.setColor graphics Color/WHITE)
+     (.setColor graphics Color/RED)
      (.setFont graphics font)
      (.drawString graphics string 10 (+ font-size 10))
      image)))
