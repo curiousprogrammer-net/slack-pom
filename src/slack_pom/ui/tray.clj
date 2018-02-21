@@ -1,4 +1,4 @@
-(ns slack-pom.tray
+(ns slack-pom.ui.tray
   (:import [java.awt Color Font SystemTray Toolkit TrayIcon]
            java.awt.image.BufferedImage))
 

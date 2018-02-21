@@ -29,18 +29,18 @@
   `keystroke` should to be a set of keys represented as integers - see `NativeKeyEvent` constants."
   [keystroke handler]
   (let [key-tracker (atom #{})
-        expected-keystroke (into #{} (map key-text) keystroke)
+        expected-keystroke (into #{} keystroke)
         listener (proxy [NativeKeyAdapter] []
                    ;; build up a local state where the sequence of pressed keys is tracked
                    (nativeKeyPressed [e]
-                     (let [keycode (-> e .getKeyCode key-text)
+                     (let [keycode (-> e .getKeyCode)
                            keystroke-so-far (swap! key-tracker conj keycode)]
                        (when (= keystroke-so-far expected-keystroke)
-                         (println "Running keystroke handler for: " keystroke-so-far)
+                         (println "Running keystroke handler for: " (mapv key-text keystroke-so-far))
                          (handler)
                          (reset! key-tracker #{}))))
                    (nativeKeyReleased [e]
-                     (swap! key-tracker disj (-> e .getKeyCode key-text) )))]
+                     (swap! key-tracker disj (-> e .getKeyCode) )))]
     (GlobalScreen/addNativeKeyListener  listener)
     listener))
 
