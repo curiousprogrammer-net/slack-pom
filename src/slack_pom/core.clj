@@ -12,24 +12,28 @@
 
 (def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
 (def slack-api-token (config/read-required-config :slack-api-token))
+(def show-system-tray-icon? (config/read-required-config :show-system-tray-icon?))
+(def show-overlay-window? (config/read-required-config :show-overlay-window?))
 
 (defn update-slack-status-fn [slack-connection]
   (fn [remaining-seconds]
     (slack/update-user-status slack-connection remaining-seconds)))
 
 (defn update-clock-tray-fn [duration-seconds]
-  (tray/remove-all-tray-icons)
-  (let [clock-tray-icon (atom (-> duration-seconds tray/create-clock-image tray/create-tray-icon))]
-    (fn [remaining-seconds]
-      (tray/update-tray-icon @clock-tray-icon
-                             (tray/create-clock-image remaining-seconds)))))
+  (when show-system-tray-icon? 
+    (tray/remove-all-tray-icons)
+    (let [clock-tray-icon (atom (-> duration-seconds tray/create-clock-image tray/create-tray-icon))]
+      (fn [remaining-seconds]
+        (tray/update-tray-icon @clock-tray-icon
+                               (tray/create-clock-image remaining-seconds))))))
 
 (defn update-clock-overlay-fn [duration-seconds]
-  (fn [remaining-seconds]
-    ;; only refresh frame if it's the whole minute
-    (when (zero? (rem remaining-seconds 60))
-      (overlay/remove-all-frames)
-      (overlay/show-frame remaining-seconds))))
+  (when show-overlay-window?
+    (fn [remaining-seconds]
+      ;; only refresh frame if it's the whole minute
+      (when (zero? (rem remaining-seconds 60))
+        (overlay/remove-all-frames)
+        (overlay/show-frame remaining-seconds)))))
 
 (defn start-pom
   ([] (start-pom default-pomodoro-duration-minutes))

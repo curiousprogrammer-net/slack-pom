@@ -50,7 +50,8 @@
           (do 
             (doseq [listener-fn listeners]
               ;; never pass negative value whatsoever to listeners
-              (listener-fn (max remaining-time 0))))))
+              (when listener-fn 
+                (listener-fn (max remaining-time 0)))))))
       (catch Exception e
         (println "ERROR: " (.getMessage e))
         (println "Trying again in the next round...")))))

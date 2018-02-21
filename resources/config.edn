@@ -1,2 +1,4 @@
 {:slack-api-token nil
- :default-pomodoro-duration-minutes 25}
+ :default-pomodoro-duration-minutes 25
+ :show-system-tray-icon? true
+ :show-overlay-window? true}
