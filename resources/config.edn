@@ -1,0 +1,2 @@
+{:slack-api-token nil
+ :default-pomodoro-duration-minutes 25}

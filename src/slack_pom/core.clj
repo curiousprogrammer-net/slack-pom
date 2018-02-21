@@ -5,8 +5,13 @@
             [slack-pom.pomodoro :as pom]
             [slack-pom.slack :as slack]
             [slack-pom.ui.overlay :as overlay]
-            [slack-pom.ui.tray :as tray])
+            [slack-pom.ui.tray :as tray]
+            [slack-pom.config :as config :refer [env]])
   (:import org.jnativehook.keyboard.NativeKeyEvent))
+
+
+(def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
+(def slack-api-token (config/read-required-config :slack-api-token))
 
 (defn update-slack-status-fn [slack-connection]
   (fn [remaining-seconds]
@@ -26,13 +31,11 @@
       (overlay/remove-all-frames)
       (overlay/show-frame remaining-seconds))))
 
-(def default-pomodoro-duration-minutes 25)
-
 (defn start-pom
   ([] (start-pom default-pomodoro-duration-minutes))
   ([duration-minutes]
    (let [duration-seconds (* 60 duration-minutes)
-         slack-connection (slack/make-connection slack-token)
+         slack-connection (slack/make-connection slack-api-token)
          listeners [(update-slack-status-fn slack-connection)
                     (update-clock-tray-fn duration-seconds)
                     (update-clock-overlay-fn duration-seconds)]]
@@ -42,7 +45,7 @@
   (pom/stop-pomodoro)
   (tray/remove-all-tray-icons)
   (overlay/remove-all-frames)
-  (slack/clear-user-status (slack/make-connection slack-token))
+  (slack/clear-user-status (slack/make-connection slack-api-token))
   nil)
 
 (defn print-help []
