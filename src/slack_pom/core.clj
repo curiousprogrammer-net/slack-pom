@@ -9,7 +9,6 @@
             [slack-pom.config :as config :refer [env]])
   (:import org.jnativehook.keyboard.NativeKeyEvent))
 
-
 (def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
 (def slack-api-token (config/read-required-config :slack-api-token))
 (def show-system-tray-icon? (config/read-required-config :show-system-tray-icon?))
@@ -56,14 +55,14 @@
   (println "
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
-     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
+     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + SHIFT + CMD (meta) + ,]
+     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + SHIFT + CMD (meta) + .]
      h:                           help
      q:                           quit
 "))
 
-(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_COMMA})
-(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_PERIOD})
+(def start-pom-shortcut #{NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_ALT NativeKeyEvent/VC_META NativeKeyEvent/VC_SHIFT NativeKeyEvent/VC_COMMA})
+(def stop-pom-shortcut #{NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_ALT NativeKeyEvent/VC_META NativeKeyEvent/VC_SHIFT NativeKeyEvent/VC_PERIOD})
 
 (def global-listeners (atom []))
 
