@@ -40,21 +40,21 @@
   "Creates a wrapper task that will be called in regular intervals until the remaining time is zero.
   This task call `listeners` functions with updated remaining time."
   [listeners]
-  (fn [] 
-    (try 
-      (let [[{:keys [remaining-time]} _] (swap-vals! pomodoro-time update :remaining-time dec)]
-        (if (neg? remaining-time)
-          (do
-            (println "pomodoro finished")
-            (stop-pomodoro))
-          (do 
-            (doseq [listener-fn listeners]
-              ;; never pass negative value whatsoever to listeners
-              (when listener-fn 
-                (listener-fn (max remaining-time 0)))))))
-      (catch Exception e
-        (println "ERROR: " (.getMessage e))
-        (println "Trying again in the next round...")))))
+  (fn []
+    (let [[{:keys [remaining-time]} _] (swap-vals! pomodoro-time update :remaining-time dec)]
+      (if (neg? remaining-time)
+        (do
+          (println "pomodoro finished")
+          (stop-pomodoro))
+        (do
+          (doseq [listener-fn listeners]
+            ;; never pass negative value whatsoever to listeners
+            (when listener-fn
+              (try
+                (listener-fn (max remaining-time 0))
+                (catch Exception e
+                  (println "ERROR! Listener failed: " (.getMessage e))
+                  (println "It will be tried again in the next update cycle."))))))))))
   
 
 (defn start-pomodoro
