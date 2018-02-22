@@ -55,14 +55,14 @@
   (println "
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + SHIFT + CMD (meta) + ,]
-     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + SHIFT + CMD (meta) + .]
+     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
+     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
      h:                           help
      q:                           quit
 "))
 
-(def start-pom-shortcut #{NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_ALT NativeKeyEvent/VC_META NativeKeyEvent/VC_SHIFT NativeKeyEvent/VC_COMMA})
-(def stop-pom-shortcut #{NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_ALT NativeKeyEvent/VC_META NativeKeyEvent/VC_SHIFT NativeKeyEvent/VC_PERIOD})
+(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_COMMA})
+(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_PERIOD})
 
 (def global-listeners (atom []))
 
