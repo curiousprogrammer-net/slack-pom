@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.julienxx/clj-slack "0.5.5"]
                  [overtone/at-at "1.2.0"]
-                 [com.1stleg/jnativehook "2.1.0"]]
+                 [com.github.tulskiy/jkeymaster "1.2"]]
   :main ^:skip-aot slack-pom.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

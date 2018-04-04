@@ -1,66 +1,41 @@
 (ns slack-pom.keyboard
-  (:import [java.util.logging Level Logger]
-           org.jnativehook.GlobalScreen
-           [org.jnativehook.keyboard NativeKeyAdapter NativeKeyEvent]))
+  (:import (com.tulskiy.keymaster.common Provider HotKeyListener)
+           (javax.swing KeyStroke)))
 
-;; disable logging output because it's very verbose
-(defn disable-logging! []
-  (-> (-> GlobalScreen .getPackage .getName)
-      (Logger/getLogger)
-      (.setLevel Level/OFF)))
+(defn shutdown-provider!
+  "Cleans up the state of the current provider and deregisters all keyboard shortcuts."
+  [provider]
+  (when provider
+    (println "Shutting down current keyboard provider.")
+    (.reset provider)
+    (.stop provider)))
 
-(defn enable-logging! []
-  (-> (-> GlobalScreen .getPackage .getName)
-      (Logger/getLogger)
-      (.setLevel Level/INFO)))
-
-(defn register-native-hook! []
-  (disable-logging!)
-  (try
-    (GlobalScreen/registerNativeHook)
-    true
-    (catch Exception e
-      (println "ERROR: cannot register native keyboard hook:" (.getMessage e))
-      false)))
-
-(defn unregister-native-hook! []
-  (GlobalScreen/unregisterNativeHook))
-
-(defn key-text [keycode]
-  (NativeKeyEvent/getKeyText keycode))
+(defn make-provider
+  "Initializes a new keyboard provider."
+  []
+  (Provider/getCurrentProvider false))
 
 (defn register-global-key-listener!
   "Runs given handler when global keyboard shortcut `keystroke` is pressed.
-  `keystroke` should to be a set of keys represented as integers - see `NativeKeyEvent` constants."
-  [keystroke handler]
-  (let [key-tracker (atom #{})
-        expected-keystroke (into #{} keystroke)
-        listener (proxy [NativeKeyAdapter] []
-                   ;; build up a local state where the sequence of pressed keys is tracked
-                   (nativeKeyPressed [e]
-                     (let [keycode (-> e .getKeyCode)
-                           keystroke-so-far (swap! key-tracker conj keycode)]
-                       (when (= keystroke-so-far expected-keystroke)
-                         (println "Running keystroke handler for: " (mapv key-text keystroke-so-far))
-                         (handler)
-                         (reset! key-tracker #{}))))
-                   (nativeKeyReleased [e]
-                     (swap! key-tracker disj (-> e .getKeyCode) )))]
-    (GlobalScreen/addNativeKeyListener  listener)
-    listener))
-
-(defn unregister-global-key-listener! [listener]
-  (GlobalScreen/removeNativeKeyListener listener))
+  `keystroke` should to be a set of keys represented as integers - see `javax.swing.KeyStroke`."
+  [provider keystroke handler]
+  (when-not provider
+    (throw (IllegalArgumentException. "Provider cannot be null")))
+  (if-let [awt-keystroke (KeyStroke/getKeyStroke keystroke)]
+    (.register provider
+               awt-keystroke
+               (proxy [HotKeyListener] []
+                 (onHotKey [hotkey]
+                   (println "Running keystroke handler for: " keystroke)
+                   (handler))))
+    (throw (ex-info "Invalid keystroke: " {:keystroke keystroke}))))
 
 (comment
-  (enable-logging!)
-  (disable-logging!)
+  (def my-provider (make-provider))
 
-  (register-native-hook!)
-  (unregister-native-hook!)
+  (register-global-key-listener!
+   my-provider
+   "ctrl meta alt COMMA"
+   #(println "something useful"))
 
-  (def listener (register-global-key-listener!))
-  (unregister-global-key-listener! listener)
-
-
-  )
+  (shutdown-provider! my-provider))

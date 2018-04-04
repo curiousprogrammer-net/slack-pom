@@ -6,8 +6,7 @@
             [slack-pom.slack :as slack]
             [slack-pom.ui.overlay :as overlay]
             [slack-pom.ui.tray :as tray]
-            [slack-pom.config :as config :refer [env]])
-  (:import org.jnativehook.keyboard.NativeKeyEvent))
+            [slack-pom.config :as config :refer [env]]))
 
 (def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
 (def slack-api-token (config/read-required-config :slack-api-token))
@@ -19,7 +18,7 @@
     (slack/update-user-status slack-connection remaining-seconds)))
 
 (defn update-clock-tray-fn [duration-seconds]
-  (when show-system-tray-icon? 
+  (when show-system-tray-icon?
     (tray/remove-all-tray-icons)
     (let [clock-tray-icon (atom (-> duration-seconds tray/create-clock-image tray/create-tray-icon))]
       (fn [remaining-seconds]
@@ -55,35 +54,21 @@
   (println "
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
-     tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
+     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [ctrl + alt + cmd (meta) + ,]
+     tp:                          stop pomodoro     - keyboard shortcut [ctrl + alt + cmd (meta) + .]
      h:                           help
      q:                           quit
 "))
 
-(def start-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_COMMA})
-(def stop-pom-shortcut #{NativeKeyEvent/VC_META NativeKeyEvent/VC_ALT NativeKeyEvent/VC_CONTROL NativeKeyEvent/VC_PERIOD})
+(def start-pom-shortcut "ctrl alt meta COMMA")
+(def stop-pom-shortcut "ctrl alt meta PERIOD")
 
-(def global-listeners (atom []))
+(defn register-keyboard-shortcuts! [keyboard-provider]
+  (keyboard/register-global-key-listener! keyboard-provider start-pom-shortcut start-pom)
+  (keyboard/register-global-key-listener! keyboard-provider stop-pom-shortcut stop-pom))
 
-(defn register-keyboard-shortcuts! []
-  (when
-   (keyboard/register-native-hook!)
-    (swap! global-listeners
-           conj
-           (keyboard/register-global-key-listener! start-pom-shortcut start-pom))
-    (swap! global-listeners
-           conj
-           (keyboard/register-global-key-listener! stop-pom-shortcut stop-pom))))
-
-(defn unregister-keyboard-shortcuts! []
-  (doseq [listener @global-listeners]
-    (keyboard/unregister-global-key-listener! listener))
-  (reset! global-listeners [])
-  (keyboard/unregister-native-hook!))
-
-#_(register-keyboard-shortcuts!)
-#_(unregister-keyboard-shortcuts!)
+(defn unregister-keyboard-shortcuts! [keyboard-provider]
+  (keyboard/shutdown-provider! keyboard-provider))
 
 (def sp-command-pattern #"sp\s?([0-9]*)")
 
@@ -93,27 +78,36 @@ Hello!
       (start-pom)
       (start-pom (Integer/valueOf duration-minutes)))))
 
+(defn- setup
+  "Prepares the system state by registering keyboard shortcuts and a shutdown function
+  to clean the system state upon termination."
+  []
+  (let [keyboard-provider (keyboard/make-provider)
+        shutdown-fn (fn shutdown []
+                      (stop-pom)
+                      (unregister-keyboard-shortcuts! keyboard-provider))]
+    (register-keyboard-shortcuts! keyboard-provider)
+    (.addShutdownHook (Runtime/getRuntime)
+                      (Thread. shutdown-fn))))
+
 (defn -main
   "Main app entry point"
   [& args]
-  (register-keyboard-shortcuts!)
+  (setup)
   (loop [command "h"]
     (if (= command "q")
-      (do 
-        (println "Quit!")
-        (unregister-keyboard-shortcuts!))
-      (do 
+      (println "Quit!")
+      (do
         (cond
           (re-find sp-command-pattern command)
           (invoke-sp-command command)
-          
+
           (= "tp" command)
           (stop-pom)
 
           (= "h" command)
           (print-help)
 
-          :else 
+          :else
           (println "Unknown command"))
-        (recur (read-line)))))
-  )
+        (recur (read-line))))))

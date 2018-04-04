@@ -71,7 +71,7 @@ Alternatively, you can run `lein repl` and call functions from `slack-pom.core` 
 ### Global Keyboard Shortcuts
 
 When application is started, it tries to register native global hook for keyboard shortcuts
-using [jnativehook](https://github.com/kwhat/jnativehook/wiki/Keyboard) library.
+using [JKeyMaster](https://github.com/tulskiy/jkeymaster) library.
 That means you usually need to add necessary permissions.
 On Mac OS this is done in `System Preferences -> Security & Privacy -> Accessibility`.
 System should show a dialog asking for such a permission during the first application run.
