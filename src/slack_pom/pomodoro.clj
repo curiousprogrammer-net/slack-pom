@@ -39,13 +39,14 @@
 (defn- update-pomodoro-task
   "Creates a wrapper task that will be called in regular intervals until the remaining time is zero.
   This task call `listeners` functions with updated remaining time."
-  [listeners]
+  [listeners after-stop-fn]
   (fn []
     (let [[{:keys [remaining-time]} _] (swap-vals! pomodoro-time update :remaining-time dec)]
       (if (neg? remaining-time)
         (do
           (println "pomodoro finished")
-          (stop-pomodoro))
+          (stop-pomodoro)
+          (after-stop-fn))
         (do
           (doseq [listener-fn listeners]
             ;; never pass negative value whatsoever to listeners
@@ -61,20 +62,21 @@
   "Starts new pomodoro session.
   The session will be automatically stopped once the timer is off.
   The default timer is set to 25 minutes."
-  ([listeners]
-   (start-pomodoro listeners 1500))
   ([listeners duration-seconds]
+   (start-pomodoro listeners duration-seconds #()))
+  ([listeners duration-seconds after-stop-fn]
    (stop-pomodoro)
+   (after-stop-fn)
    (println "Start pomodoro task.")
    (reset! pomodoro-time {:start-timestamp (System/currentTimeMillis)
                           :remaining-time duration-seconds})
 
    (let [scheduled-task (schedule-fixed-rate-task
                          pomodoro-scheduler
-                         (update-pomodoro-task listeners)
+                         (update-pomodoro-task listeners after-stop-fn)
                          ;; fixed interval 1 second
-                         1)
-         _ (reset! pomodoro-task scheduled-task)])))
+                         1)]
+     (reset! pomodoro-task scheduled-task))))
 
 
 (comment

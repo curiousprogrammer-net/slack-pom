@@ -7,6 +7,7 @@
 ;;; * Your need to create a connection map like {:api-url "https://slack.com/api" :token "YOUR TOKEN"}
 ;;;   and pass it as the first argument of every functions in clj-slack
 
+;; TODO: move to config.edn
 (def slack-api-url "https://slack.com/api")
 (def set-profile-endpoint "users.profile.set")
 
@@ -18,7 +19,7 @@
 
 (defn- build-status [remaining-seconds]
   (let [remaining-minutes (quot remaining-seconds 60)]
-    (let [pomodoro-done? (zero? remaining-seconds)
+    (let [pomodoro-done? (<= remaining-seconds 0)
           status-text (if pomodoro-done?
                         ""
                         (format "Pomodoro - %s min left" remaining-minutes))

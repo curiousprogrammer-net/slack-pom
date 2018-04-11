@@ -33,6 +33,13 @@
         (overlay/remove-all-frames)
         (overlay/show-frame remaining-seconds)))))
 
+(defn stop-pom []
+  (pom/stop-pomodoro)
+  (tray/remove-all-tray-icons)
+  (overlay/remove-all-frames)
+  (slack/clear-user-status (slack/make-connection slack-api-token))
+  nil)
+
 (defn start-pom
   ([] (start-pom default-pomodoro-duration-minutes))
   ([duration-minutes]
@@ -41,14 +48,7 @@
          listeners [(update-slack-status-fn slack-connection)
                     (update-clock-tray-fn duration-seconds)
                     (update-clock-overlay-fn duration-seconds)]]
-     (pom/start-pomodoro listeners duration-seconds))))
-
-(defn stop-pom []
-  (pom/stop-pomodoro)
-  (tray/remove-all-tray-icons)
-  (overlay/remove-all-frames)
-  (slack/clear-user-status (slack/make-connection slack-api-token))
-  nil)
+     (pom/start-pomodoro listeners duration-seconds stop-pom))))
 
 (defn print-help []
   (println "
