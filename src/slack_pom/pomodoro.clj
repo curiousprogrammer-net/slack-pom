@@ -61,7 +61,8 @@
 (defn start-pomodoro
   "Starts new pomodoro session.
   The session will be automatically stopped once the timer is off.
-  The default timer is set to 25 minutes."
+  The default timer is set to 25 minutes.
+  Returns nil."
   ([listeners duration-seconds]
    (start-pomodoro listeners duration-seconds #()))
   ([listeners duration-seconds after-stop-fn]
@@ -76,7 +77,8 @@
                          (update-pomodoro-task listeners after-stop-fn)
                          ;; fixed interval 1 second
                          1)]
-     (reset! pomodoro-task scheduled-task))))
+     (reset! pomodoro-task scheduled-task))
+   nil))
 
 
 (comment
