@@ -1,12 +1,13 @@
 (ns slack-pom.core
   (:gen-class)
   (:require [clojure.string :as string]
+            [slack-pom.audio.sound :as sound]
+            [slack-pom.config :as config :refer [env]]
             [slack-pom.keyboard :as keyboard]
             [slack-pom.pomodoro :as pom]
             [slack-pom.slack :as slack]
             [slack-pom.ui.overlay :as overlay]
-            [slack-pom.ui.tray :as tray]
-            [slack-pom.config :as config :refer [env]]))
+            [slack-pom.ui.tray :as tray]))
 
 (def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
 (def slack-api-token (config/read-required-config :slack-api-token))
@@ -38,6 +39,7 @@
   (tray/remove-all-tray-icons)
   (overlay/remove-all-frames)
   (slack/clear-user-status (slack/make-connection slack-api-token))
+  (sound/alert)
   nil)
 
 (defn start-pom
