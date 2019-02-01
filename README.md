@@ -102,7 +102,7 @@ Hello!
 
 ## License
 
-Copyright © 2018 Juraj Martinka (curiousprogrammer.net)
+Copyright © 2018 Juraj Martinka (https://jurajmartinka.com/)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
