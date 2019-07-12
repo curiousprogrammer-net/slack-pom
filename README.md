@@ -4,7 +4,7 @@ Update your slack status automatically when using pomodoro technique.
 
 ## Motivation
 
-I use [Kanbanflow](https://kanbanflow.com) for simple task management and as a pomodoro timer.
+I used [Kanbanflow](https://kanbanflow.com) for simple task management and as a pomodoro timer.
 Unfortunately, the timer is only visible on the web page so I had to switch back to chrome when I wanted
 to see the reamining time which was quite distracting.
 Moreover, I wanted to communicate to my colleagues that I'm in the middle of pomodoro so I might be unresponsive for a while.
