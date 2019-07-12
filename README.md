@@ -99,6 +99,15 @@ Hello!
      q:                           quit
 ```
 
+E.g. to start a longer 50-minute session you can use `sp 50` command:
+```
+sp 50
+Stop pomodoro task.
+Update slack status:
+Start pomodoro task.
+Update slack status:  Pomodoro - 50 min left
+
+```
 
 ## License
 
