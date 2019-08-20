@@ -52,6 +52,13 @@
                     (update-clock-overlay-fn duration-seconds)]]
      (pom/start-pomodoro listeners duration-seconds stop-pom))))
 
+(defn start-break
+  "start-break is just a prmitive alias for `(start-pom 5).
+  For other durations, user needs to use command line interface anyway and so he can
+  `start-pom` instead."
+  []
+  (start-pom 5))
+
 (defn print-help []
   (println "
 Hello!
@@ -64,10 +71,13 @@ Hello!
 
 (def start-pom-shortcut "ctrl alt meta COMMA")
 (def stop-pom-shortcut "ctrl alt meta PERIOD")
+;; `start-break` is just a primitive alias for `(start-pom 5)`
+(def start-break-shortcut "ctrl alt meta SLASH")
 
 (defn register-keyboard-shortcuts! [keyboard-provider]
   (keyboard/register-global-key-listener! keyboard-provider start-pom-shortcut start-pom)
-  (keyboard/register-global-key-listener! keyboard-provider stop-pom-shortcut stop-pom))
+  (keyboard/register-global-key-listener! keyboard-provider stop-pom-shortcut stop-pom)
+  (keyboard/register-global-key-listener! keyboard-provider start-break-shortcut start-break))
 
 (defn unregister-keyboard-shortcuts! [keyboard-provider]
   (keyboard/shutdown-provider! keyboard-provider))

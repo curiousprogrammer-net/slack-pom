@@ -4,6 +4,14 @@ This change log follows the conventions of [keepachangelog.com](http://keepachan
 
 ## [Unreleased]
 
+## 0.1.1-SNAPSHOT
+
+### Added
+- Add `start-break` shortcut (Ctrl-Alt-Cmd-/). This is just quick shortcut for starting 5-min "pomodoro" aka "break". For other durations you can use `start-pom` directly.
+
+
+## 0.1.0-SNAPSHOT
+
 ### Added 
 - [Simple sound alert](https://freesound.org/people/themusicalnomad/sounds/253886/) when pomodoro is stopped.
 
