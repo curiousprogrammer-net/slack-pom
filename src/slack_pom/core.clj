@@ -123,3 +123,9 @@ Hello!
           :else
           (println "Unknown command"))
         (recur (read-line))))))
+
+(comment
+
+  (def my-app (future (-main)))
+
+  )
