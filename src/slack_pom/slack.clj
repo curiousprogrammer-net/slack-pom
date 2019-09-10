@@ -29,11 +29,14 @@
       {:text status-text
        :emoji status-emoji})))
 
+(defn formatted-current-time []
+  (-> (java.time.LocalDateTime/now) (.format (java.time.format.DateTimeFormatter/ofPattern "MM/dd HH:mm:ss"))))
+
 (defn update-user-status [slack-connection remaining-seconds]
   (when (zero? (mod remaining-seconds 60))
     ;; update in 1-minute intervals
     (let [{:keys [text emoji]} (build-status remaining-seconds)]
-      (println "Update slack status: " text)
+      (println (formatted-current-time) "Update slack status: " text)
       (update-status slack-connection
                      text
                      emoji))))
