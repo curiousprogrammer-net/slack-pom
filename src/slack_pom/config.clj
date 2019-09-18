@@ -20,8 +20,10 @@
 (def env (read-env))
 
 (defn read-required-config [config-key]
-  (or (env config-key)
-      (throw (ex-info (str "Missing required configuration key: " config-key)
-                      {:config-key config-key
-                       :error "Missing data"}))))
+  ;; `find` is used to make sure we return value of the config key even if it's nil 
+  (if-some [[_k v] (find env config-key)]
+    v
+    (throw (ex-info (str "Missing required configuration key: " config-key)
+                    {:config-key config-key
+                     :error "Missing data"}))))
 
