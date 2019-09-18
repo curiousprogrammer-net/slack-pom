@@ -55,7 +55,8 @@
                 (listener-fn (max remaining-time 0))
                 (catch Exception e
                   (println "ERROR! Listener failed: " (.getMessage e))
-                  (println "It will be tried again in the next update cycle."))))))))))
+                  (println "It will be tried again in the next update cycle.")
+                  (.printStackTrace e))))))))))
   
 
 (defn start-pomodoro

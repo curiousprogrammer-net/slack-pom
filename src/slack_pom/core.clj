@@ -98,6 +98,11 @@ Hello!
         shutdown-fn (fn shutdown []
                       (stop-pom)
                       (unregister-keyboard-shortcuts! keyboard-provider))]
+    (Thread/setDefaultUncaughtExceptionHandler
+     (reify Thread$UncaughtExceptionHandler
+       (uncaughtException [_ thread ex]
+         (println "Uncaught exception on" (.getName thread))
+         (.printStackTrace ex))))
     (register-keyboard-shortcuts! keyboard-provider)
     (.addShutdownHook (Runtime/getRuntime)
                       (Thread. shutdown-fn))))
