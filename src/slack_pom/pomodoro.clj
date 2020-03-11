@@ -47,16 +47,15 @@
           (println "pomodoro finished")
           (stop-pomodoro)
           (after-stop-fn))
-        (do
-          (doseq [listener-fn listeners]
-            ;; never pass negative value whatsoever to listeners
-            (when listener-fn
-              (try
-                (listener-fn (max remaining-time 0))
-                (catch Exception e
-                  (println "ERROR! Listener failed: " (.getMessage e))
-                  (println "It will be tried again in the next update cycle.")
-                  (.printStackTrace e))))))))))
+        (doseq [listener-fn listeners]
+          ;; never pass negative value whatsoever to listeners
+          (when listener-fn
+            (try
+              (listener-fn (max remaining-time 0))
+              (catch Exception e
+                (println "ERROR! Listener failed: " (.getMessage e))
+                (println "It will be tried again in the next update cycle.")
+                (.printStackTrace e)))))))))
   
 
 (defn start-pomodoro
