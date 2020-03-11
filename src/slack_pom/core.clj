@@ -53,7 +53,7 @@
      (pom/start-pomodoro listeners duration-seconds stop-pom))))
 
 (defn start-break
-  "start-break is just a prmitive alias for `(start-pom 5).
+  "start-break is just a primitive alias for `(start-pom 5).
   For other durations, user needs to use command line interface anyway and so he can
   `start-pom` instead."
   []

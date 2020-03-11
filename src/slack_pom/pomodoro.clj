@@ -67,11 +67,15 @@
    (start-pomodoro listeners duration-seconds #()))
   ([listeners duration-seconds after-stop-fn]
    (stop-pomodoro)
-   (after-stop-fn)
+   (try
+     (after-stop-fn)
+     (catch Exception e
+       (println "ERROR! Couldn't call `after-stop-fn` ")
+       (.printStackTrace e)))
+
    (println "Start pomodoro task.")
    (reset! pomodoro-time {:start-timestamp (System/currentTimeMillis)
                           :remaining-time duration-seconds})
-
    (let [scheduled-task (schedule-fixed-rate-task
                          pomodoro-scheduler
                          (update-pomodoro-task listeners after-stop-fn)
