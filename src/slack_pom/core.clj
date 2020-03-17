@@ -47,9 +47,9 @@
   ([duration-minutes]
    (let [duration-seconds (* 60 duration-minutes)
          slack-connection (slack/make-connection slack-api-token)
-         listeners [(update-slack-status-fn slack-connection)
-                    (update-clock-tray-fn duration-seconds)
-                    (update-clock-overlay-fn duration-seconds)]]
+         listeners [(update-clock-tray-fn duration-seconds)
+                    (update-clock-overlay-fn duration-seconds)
+                    (update-slack-status-fn slack-connection)]]
      (pom/start-pomodoro listeners duration-seconds stop-pom))))
 
 (defn start-break
