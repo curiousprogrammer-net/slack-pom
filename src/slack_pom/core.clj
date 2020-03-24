@@ -63,20 +63,21 @@
   (println "
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [ctrl + alt + cmd (meta) + ,]
-     tp:                          stop pomodoro     - keyboard shortcut [ctrl + alt + cmd (meta) + .]
+     sp [duration-in-minutes]:    start pomodoro    - 25 mins -> [ctrl + alt + cmd (meta) + ,]
+                                                    - 15 mins -> [ctrl + alt + cmd (meta) + .]
+     tp:                          stop pomodoro
      h:                           help
      q:                           quit
 "))
 
 (def start-pom-shortcut "ctrl alt meta COMMA")
-(def stop-pom-shortcut "ctrl alt meta PERIOD")
+(def start-short-pom-shortcut "ctrl alt meta PERIOD")
 ;; `start-break` is just a primitive alias for `(start-pom 5)`
 (def start-break-shortcut "ctrl alt meta SLASH")
 
 (defn register-keyboard-shortcuts! [keyboard-provider]
   (keyboard/register-global-key-listener! keyboard-provider start-pom-shortcut start-pom)
-  (keyboard/register-global-key-listener! keyboard-provider stop-pom-shortcut stop-pom)
+  (keyboard/register-global-key-listener! keyboard-provider start-short-pom-shortcut #(start-pom 15))
   (keyboard/register-global-key-listener! keyboard-provider start-break-shortcut start-break))
 
 (defn unregister-keyboard-shortcuts! [keyboard-provider]
