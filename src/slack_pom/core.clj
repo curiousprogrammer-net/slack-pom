@@ -7,7 +7,8 @@
             [slack-pom.pomodoro :as pom]
             [slack-pom.slack :as slack]
             [slack-pom.ui.overlay :as overlay]
-            [slack-pom.ui.tray :as tray]))
+            [slack-pom.ui.tray :as tray]
+            [slack-pom.utils :as u]))
 
 (def default-pomodoro-duration-minutes (config/read-required-config :default-pomodoro-duration-minutes))
 (def slack-api-token (config/read-required-config :slack-api-token))
@@ -15,8 +16,14 @@
 (def show-overlay-window? (config/read-required-config :show-overlay-window?))
 
 (defn update-slack-status-fn [slack-connection]
+  ;; enforce timeout on slack update status - the slack lib doesn't expose any setting for that
+  ;; this helps to ensure that long timeouts (when Internet connection is broken)
+  ;; doesn't affect the behavior that much
   (fn [remaining-seconds]
-    (slack/update-user-status slack-connection remaining-seconds)))
+    (u/with-timeout
+      3000
+      #(slack/update-user-status slack-connection remaining-seconds)
+      #())))
 
 (defn update-clock-tray-fn [duration-seconds]
   (when show-system-tray-icon?
