@@ -15,14 +15,14 @@
 (def show-system-tray-icon? (config/read-required-config :show-system-tray-icon?))
 (def show-overlay-window? (config/read-required-config :show-overlay-window?))
 
-(defn update-slack-status-fn [slack-connection]
+(defn update-slack-status-fn [slack-connection description]
   ;; enforce timeout on slack update status - the slack lib doesn't expose any setting for that
   ;; this helps to ensure that long timeouts (when Internet connection is broken)
   ;; doesn't affect the behavior that much
   (fn [remaining-seconds]
     (u/with-timeout
       3000
-      #(slack/update-user-status slack-connection remaining-seconds)
+      #(slack/update-user-status slack-connection remaining-seconds description)
       #())))
 
 (defn update-clock-tray-fn [duration-seconds]
@@ -50,21 +50,20 @@
   nil)
 
 (defn start-pom
-  ([] (start-pom default-pomodoro-duration-minutes))
-  ([duration-minutes]
-   (let [duration-seconds (* 60 duration-minutes)
-         slack-connection (slack/make-connection slack-api-token)
-         listeners [(update-clock-tray-fn duration-seconds)
-                    (update-clock-overlay-fn duration-seconds)
-                    (update-slack-status-fn slack-connection)]]
-     (pom/start-pomodoro listeners duration-seconds stop-pom))))
+  [{:keys [duration description] :or {duration default-pomodoro-duration-minutes} :as _pom-config}]
+  (let [duration-seconds (* 60 duration)
+        slack-connection (slack/make-connection slack-api-token)
+        listeners [(update-clock-tray-fn duration-seconds)
+                   (update-clock-overlay-fn duration-seconds)
+                   (update-slack-status-fn slack-connection description)]]
+    (pom/start-pomodoro listeners duration-seconds stop-pom)))
 
 (defn start-break
   "start-break is just a primitive alias for `(start-pom 5).
   For other durations, user needs to use command line interface anyway and so he can
   `start-pom` instead."
   []
-  (start-pom 5))
+  (start-pom {:duration 5}))
 
 (defn print-help []
   (println "
@@ -79,24 +78,30 @@ Hello!
 
 (def start-pom-shortcut "ctrl alt meta COMMA")
 (def start-short-pom-shortcut "ctrl alt meta PERIOD")
-;; `start-break` is just a primitive alias for `(start-pom 5)`
+;; `start-break` is just a primitive alias for `start-pom`
 (def start-break-shortcut "ctrl alt meta SLASH")
+;; TODO: doesn't work
+(def start-very-short-pom-shortcut "ctrl alt meta shift SLASH")
 
 (defn register-keyboard-shortcuts! [keyboard-provider]
   (keyboard/register-global-key-listener! keyboard-provider start-pom-shortcut start-pom)
-  (keyboard/register-global-key-listener! keyboard-provider start-short-pom-shortcut #(start-pom 15))
-  (keyboard/register-global-key-listener! keyboard-provider start-break-shortcut start-break))
+  (keyboard/register-global-key-listener! keyboard-provider start-short-pom-shortcut #(start-pom {:duration 15}))
+  (keyboard/register-global-key-listener! keyboard-provider start-break-shortcut start-break)
+  (keyboard/register-global-key-listener! keyboard-provider start-very-short-pom-shortcut #(start-pom {:duration 2})))
 
 (defn unregister-keyboard-shortcuts! [keyboard-provider]
   (keyboard/shutdown-provider! keyboard-provider))
 
-(def sp-command-pattern #"sp\s?([0-9]*)")
+(def sp-command-pattern #"sp\s?([0-9]*)\s*(.*)")
 
 (defn- invoke-sp-command [command]
-  (let [[_ duration-minutes] (re-find  sp-command-pattern command)]
-    (if (string/blank? duration-minutes)
-      (start-pom)
-      (start-pom (Integer/valueOf duration-minutes)))))
+  (let [[_ duration description] (re-find  sp-command-pattern command)
+        pom-config (cond-> {:description description}
+                     (not (string/blank? duration)) (assoc :duration (Integer/valueOf duration)))]
+    (start-pom pom-config)))
+(comment
+   (invoke-sp-command "sp3 doing nothing right now")
+  ,)
 
 (defn- setup
   "Prepares the system state by registering keyboard shortcuts and a shutdown function

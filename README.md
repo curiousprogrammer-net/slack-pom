@@ -44,8 +44,9 @@ with a nice tomato icon:
 
 ## Configuration
 
-You need to provide a proper slack API token for your slack team.
-See https://github.com/julienXX/clj-slack#usage for instructions how to get the API token.
+You need to provide a proper slack API token for your slack workspace: https://api.slack.com/tutorials/tracks/getting-a-token
+The token must have `users.profile:write` permission scope - as of 2023,
+only _user_ tokens can do that: https://api.slack.com/authentication/token-types#user
 
 Once you have the token, create custom [`config.edn`](resources/config.edn) file in the root directory (the directory
 where the program is run).
@@ -59,8 +60,27 @@ Just copy it and provide the required config.
 
 WARNING: the application has only been tested on Mac OS High Sierra 10.13.3.
 
+### Run from the source
+
+This is preferable unless you really want to build an uberjar and run it as `java -jar`.
+
+Use `clj -X`: https://clojure.org/guides/deps_and_cli#_using_a_main
+
+```
+clj -X slack-pom.core/-main
+```
+
+There's a handy wrapper script for this: ``slack-pom.sh`.
+
 ### Build and Run
 
+#### deps.end (build-clj)
+
+```
+clojure -T:build org.corfield.build/uber :lib net.curiousprogrammer/slack-pom :main slack-pom.core
+```
+
+#### Leiningen (obsolete)
 ```
 lein uberjar
 java -jar target/uberjar/slack-pom-0.1.0-SNAPSHOT-standalone.jar

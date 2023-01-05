@@ -55,7 +55,9 @@
               (catch Exception e
                 (println "ERROR! Listener failed: " (.getMessage e))
                 (println "It will be tried again in the next update cycle.")
-                (.printStackTrace e)))))))))
+                (println "===== Exception stack trace =====")
+                (.printStackTrace e)
+                (println "\n=================================")))))))))
   
 
 (defn start-pomodoro
