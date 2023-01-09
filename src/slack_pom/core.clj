@@ -50,13 +50,14 @@
   nil)
 
 (defn start-pom
-  [{:keys [duration description] :or {duration default-pomodoro-duration-minutes} :as _pom-config}]
-  (let [duration-seconds (* 60 duration)
-        slack-connection (slack/make-connection slack-api-token)
-        listeners [(update-clock-tray-fn duration-seconds)
-                   (update-clock-overlay-fn duration-seconds)
-                   (update-slack-status-fn slack-connection description)]]
-    (pom/start-pomodoro listeners duration-seconds stop-pom)))
+  ([] (start-pom {}))
+  ([{:keys [duration description] :or {duration default-pomodoro-duration-minutes} :as _pom-config}]
+   (let [duration-seconds (* 60 duration)
+         slack-connection (slack/make-connection slack-api-token)
+         listeners [(update-clock-tray-fn duration-seconds)
+                    (update-clock-overlay-fn duration-seconds)
+                    (update-slack-status-fn slack-connection description)]]
+     (pom/start-pomodoro listeners duration-seconds stop-pom))))
 
 (defn start-break
   "start-break is just a primitive alias for `(start-pom 5).
