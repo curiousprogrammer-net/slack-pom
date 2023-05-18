@@ -40,7 +40,7 @@
         pomodoro-done? (<= remaining-seconds 0)
         status-text (if pomodoro-done?
                       ""
-                      (format "%s [%s min(s) left]" (or description "") remaining-minutes))
+                      (format "%s [%s mins left]" (or description "") remaining-minutes))
         status-emoji (if pomodoro-done?
                        ""
                        ":tomato:")]
