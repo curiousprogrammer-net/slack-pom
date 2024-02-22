@@ -1,0 +1,3 @@
+{:min-bb-version "1.3.181"
+ :tasks {build (clojure "-T:build org.corfield.build/uber :lib net.curiousprogrammer/slack-pom :main slack-pom.core")
+}}

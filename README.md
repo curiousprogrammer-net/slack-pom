@@ -74,6 +74,22 @@ There's a handy wrapper script for this: ``slack-pom.sh`.
 
 ### Build and Run
 
+#### Build jkeymaster dependency (submodule)
+
+Switch to the jkeymaster submodule dependency/folder
+and build it:
+```
+mvn -DskipTests=true clean install
+```
+
+This should install the version 1.4-SNAPSHOT into your local maven repo.
+That's then used in deps.edn
+```
+        com.github.tulskiy/jkeymaster {:mvn/version "1.4-SNAPSHOT"}}
+```
+
+
+
 #### deps.end (build-clj)
 
 ```
