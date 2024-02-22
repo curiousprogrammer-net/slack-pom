@@ -146,5 +146,6 @@ Hello!
 (comment
 
   (def my-app (future (-main)))
+  (future-cancel my-app)
 
   )
