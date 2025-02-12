@@ -129,13 +129,15 @@ The help is printed when the application is started:
 ```
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - keyboard shortcut [CTRL + ALT + CMD (meta) + ,]
+     [sp] [duration-in-minutes]:  start pomodoro    - 25 mins -> [ctrl + alt + cmd (meta) + ,]
+                                                    - 15 mins -> [ctrl + alt + cmd (meta) + .]
+                                  - notice the 'sp' prefix is optional, so you can just enter the number of minutes
      tp:                          stop pomodoro     - keyboard shortcut [CTRL + ALT + CMD (meta) + .]
      h:                           help
      q:                           quit
 ```
 
-E.g. to start a longer 50-minute session you can use `sp 50` command:
+E.g. to start a longer 50-minute session you can use `50` command:
 ```
 sp 50
 Stop pomodoro task.

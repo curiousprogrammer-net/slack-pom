@@ -70,8 +70,9 @@
   (println "
 Hello!
    Commands
-     sp [duration-in-minutes]:    start pomodoro    - 25 mins -> [ctrl + alt + cmd (meta) + ,]
+     [sp] [duration-in-minutes]:  start pomodoro    - 25 mins -> [ctrl + alt + cmd (meta) + ,]
                                                     - 15 mins -> [ctrl + alt + cmd (meta) + .]
+                                  - notice the 'sp' prefix is optional, so you can just enter the number of minutes
      tp:                          stop pomodoro
      h:                           help
      q:                           quit
@@ -93,15 +94,25 @@ Hello!
 (defn unregister-keyboard-shortcuts! [keyboard-provider]
   (keyboard/shutdown-provider! keyboard-provider))
 
-(def sp-command-pattern #"sp\s?([0-9]*)\s*(.*)")
+;; You can start a pomodoro just by typing in the _number_ of minutes (prefix "sp" is optional)
+(def sp-command-pattern #"(sp)?\s?([0-9]*)\s*(.*)")
+
+(defn- parse-sp-command [command]
+  (let [[_match _sp duration description] (re-find  sp-command-pattern command)]
+    [duration description]))
 
 (defn- invoke-sp-command [command]
-  (let [[_ duration description] (re-find  sp-command-pattern command)
+  (let [[duration description] (parse-sp-command command)
         pom-config (cond-> {:description description}
                      (not (string/blank? duration)) (assoc :duration (Integer/valueOf duration)))]
     (start-pom pom-config)))
 (comment
-   (invoke-sp-command "sp3 doing nothing right now")
+  (parse-sp-command "3")
+  ;; => ["3" ""]
+  (parse-sp-command "3 some quick session")
+  ;; => ["3" "some quick session"]
+
+  (invoke-sp-command "sp3 doing nothing right now")
   ,)
 
 (defn- setup
