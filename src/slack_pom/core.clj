@@ -20,10 +20,11 @@
   ;; this helps to ensure that long timeouts (when Internet connection is broken)
   ;; doesn't affect the behavior that much
   (fn [remaining-seconds]
-    (u/with-timeout
-      3000
-      #(slack/update-user-status slack-connection remaining-seconds description)
-      #())))
+    (when slack-connection
+      (u/with-timeout
+        3000
+        #(slack/update-user-status slack-connection remaining-seconds description)
+        #()))))
 
 (defn update-clock-tray-fn [duration-seconds]
   (when show-system-tray-icon?
@@ -45,7 +46,8 @@
   (pom/stop-pomodoro)
   (tray/remove-all-tray-icons)
   (overlay/remove-all-frames)
-  (slack/clear-user-status (slack/make-connection slack-api-token))
+  (when slack-api-token
+    (slack/clear-user-status (slack/make-connection slack-api-token)))
   (sound/alert)
   nil)
 
@@ -53,7 +55,7 @@
   ([] (start-pom {}))
   ([{:keys [duration description] :or {duration default-pomodoro-duration-minutes} :as _pom-config}]
    (let [duration-seconds (* 60 duration)
-         slack-connection (slack/make-connection slack-api-token)
+         slack-connection (some-> slack-api-token slack/make-connection)
          listeners [(update-clock-tray-fn duration-seconds)
                     (update-clock-overlay-fn duration-seconds)
                     (update-slack-status-fn slack-connection description)]]

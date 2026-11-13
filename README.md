@@ -44,7 +44,7 @@ with a nice tomato icon:
 
 ## Configuration
 
-You need to provide a proper slack API token for your slack workspace: https://api.slack.com/tutorials/tracks/getting-a-token
+You should provide a proper slack API token for your slack workspace: https://api.slack.com/tutorials/tracks/getting-a-token
 The token must have `users.profile:write` permission scope - as of 2023,
 only _user_ tokens can do that: https://api.slack.com/authentication/token-types#user
 
@@ -54,6 +54,10 @@ where the program is run).
 You don't have to modify [built-in `config.edn` file](resources/config.edn).
 This is used as a template and also to provide defaults for optional keys.
 Just copy it and provide the required config.
+
+NOTE: the default config value for `:slack-api-token` specifies `nil`
+and it's possible to use the app app without a token.
+In that case, the Slack status updates are skipped.
 
 
 ## Usage
@@ -94,6 +98,12 @@ That's then used in deps.edn
 
 ```
 clojure -T:build org.corfield.build/uber :lib net.curiousprogrammer/slack-pom :main slack-pom.core
+```
+
+To make this easier, there's a babashka task for it:
+
+```
+bb build
 ```
 
 #### Leiningen (obsolete)

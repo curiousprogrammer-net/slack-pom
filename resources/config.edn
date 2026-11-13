@@ -1,4 +1,4 @@
-{:slack-api-token nil
+{:slack-api-token nil ; default value is nil to satisfy `read-required-config`
  :default-pomodoro-duration-minutes 25
  :show-system-tray-icon? true
  :show-overlay-window? true}

@@ -15,12 +15,6 @@
    (uncaughtException [_ thread ex]
      (println "Uncaught exception: " (.getMessage ex) "; on " (.getName thread)))))
 
-(defn- start-time [pomodoro-time]
-  (:start-timestamp pomodoro-time))
-
-(defn- remaining-time [pomodoro-time]
-  (:remaining-time pomodoro-time))
-
 ;;; java timer: https://stackoverflow.com/questions/16385049/timers-in-clojure
 (defn- schedule-fixed-rate-task
   "Schedules given 0-arg function to be executed repeatedly at the given fixed rate in seconds.
